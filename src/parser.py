@@ -64,3 +64,21 @@ def parse_command(command):
     components['arguments'] = components['arguments'].rstrip('\r')
 
     return components
+'''
+up/down/left/right will only be parsed out if the first characters in it are the command and all others are either
+a number (to indicate how many) or whitepace
+
+Preconditions: input is a string
+Postconditions: if input begins with "up" "down" "left" or "right" after whitespace is removed and the only other chars in the
+string (if any) are ints then returns the direction otherwise will return false
+
+example     INPUTS              OUTPUTS
+            up5                 true
+             down9              true
+            9right              false
+            upleft              false
+               left  27         true
+'''
+def parse_direction_check(direction):
+    pass
+    #todo(metro) WRITE THIS

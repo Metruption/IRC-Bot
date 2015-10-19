@@ -71,6 +71,49 @@ def run(socket, channels, cmds, nick):
 
                                     logging.error(str(e))
 
+
+                        '''so we need to parse out "up, down, left, right, a, b, start, select
+                        a/b/start/select will only be parsed out if it is the only thing in the message
+
+                        up/down/left/right will only be parsed out if the first characters in it are the command and all others are either
+                        a number (to indicate how many) or whitepace
+
+                        '''
+                        elif 'a' == components['arguments']:
+                            print(components['sender'] + ":" + components['arguments'] + ": (between colons should be \"a\"")
+                            #@TODO(metro) make it press a
+
+                        elif 'b' == components['arguments']:
+                            print(components['sender'] + ":" + components['arguments'] + ": (between colons should be \"b\"")
+                            #@TODO(metro) make it press b
+
+                        elif 'start' = components['arguments']:
+                            print(components['sender'] + ":" + components['arguments'] + ": (between colons should be \"start\"")
+                            #@TODO(metro) make it press start
+
+                        elif 'start' = components['arguments']:
+                            print(components['sender'] + ":" + components['arguments'] + ": (between colons should be \"select\"")
+                            #@TODO(metro) make it press select
+                    
+                        #todo(metro) make up/down/left right follow the special rule
+                        #up/down/left/right will only be parsed out if the first characters in it are the command and all others are either
+                        #a number (to indicate how many) or whitepace
+                        elif 'up' = parser.parse_direction_check(components['arguments']):
+                            print(components['sender'] + ":" + components['arguments'] + ": (between colons should be \"up\"*")
+                            #@TODO(metro) make it press up
+
+                        elif 'down' = parser.parse_direction_check(components['arguments']):
+                            print(components['sender'] + ":" + components['arguments'] + ": (between colons should be \"down\"*")
+                            #@TODO(metro) make it press down
+
+                        elif 'left' = parser.parse_direction_check(components['arguments']):
+                            print(components['sender'] + ":" + components['arguments'] + ": (between colons should be \"left\"*")
+                            #@TODO(metro) make it press left
+
+                        elif 'right' = parser.parse_direction_check(components['arguments']):
+                            print(components['sender'] + ":" + components['arguments'] + ": (between colons should be \"right\"*")
+                            #@TODO(metro) make it press right
+
                     # run auto commands
                     for cmd in config.cmds['auto']:
                         callable_cmd = get_cmd(cmd, cmds['auto'])
