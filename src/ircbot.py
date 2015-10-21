@@ -44,6 +44,7 @@ def run(socket, channels, cmds, nick):
                     response.append(':' + components['arguments'])
 
                 elif 'PRIVMSG' == components['action']:
+
                     if '!' == components['arguments'][0]:
                         # a command from a user only makes sense if it starts
                         # with an exclamation mark
@@ -95,7 +96,7 @@ def run(socket, channels, cmds, nick):
                             print(components['sender'] + ":" + components['arguments'] + ": (between colons should be \"select\"")
                             #@TODO(metro) make it press select
                     
-                        #todo(metro) make up/down/left right follow the special rule
+                        #todoNE(metro) make up/down/left right follow the special rule
                         #up/down/left/right will only be parsed out if the first characters in it are the command and all others are either
                         #a number (to indicate how many) or whitepace
                         elif 'up' = parser.parse_direction_check(components['arguments']):
