@@ -64,27 +64,3 @@ def parse_command(command):
     components['arguments'] = components['arguments'].rstrip('\r')
 
     return components
-'''
-up/down/left/right will only be parsed out if the first characters in it are the command and all others are either
-a number (to indicate how many) or whitepace
-
-Preconditions: input is a string
-Postconditions: if input begins with "up" "down" "left" or "right" after whitespace is removed and the only other chars in the
-string (if any) are ints then returns the direction; otherwise will return False
-
-example     INPUTS              OUTPUTS
-            up5                 up
-             down9              down
-            9right              False
-            upleft              False
-               left  27         left
-'''
-def parse_direction_check(direction):
-    if direction[0] not in ['u','d','l','r']:
-        return False
-
-    direction = ''.join(i for i in direction if not i.isdigit()) #remove numbers from direction
-    direction.replace(' ','') #remove spaces from direction
-    if direction.lower() in ['up','down','left','right']:
-        return direction.lower()
-    return False

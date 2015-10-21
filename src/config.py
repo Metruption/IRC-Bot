@@ -5,29 +5,26 @@ import logging
 
 # some commands can be executed only if the user's nick is found in this list
 owner = list(set([
-    'paullik',
-    'foobarfoo',
-    'paullik-test',
+    'Metruption'
 ]))
 
 owner_email = {
-    'foobarfoo': 'foobar@gmail.com',
+    'Metruption': 'theaaront222@yahoo.com',
 }
 
 # server to connect to
-server = 'chat.freenode.net'
+server = 'irc.twitch.tv'
 # server's port
 port = 6667
 
 # bot's nicknames
-nicks = list(set(['PPyBot']))
+nicks = list(set(['Metrotwitchplays']))
 # bot's real name
-real_name = 'Paul Python Bot'
+real_name = 'Metruption'
 
 # channels to join on startup
 channels = list(set([
-    '#ppybbot',
-    '#test-chan',
+    '#metrotwitchplays'
 ]))
 
 cmds = {
@@ -41,18 +38,15 @@ cmds = {
 
     # normal commands list, the ones that are accessible to any user
     'user': list(set([
-        'task',
-        'wiki',
-        'answer',
-        'about',
-        'help',
-        'weather',
-        'google',
-        'mball',
-        'uptime',
-        'so',
-        'twitter',
-    ])),
+        #REMOVE ALL THE OLD COMMANDS I DONT NEED ANY OF THEM MWAGHHAHAH (i'll keep their code just so I can cheat and look at them)
+        #todo(metro) think of commands and implement them
+        '''
+        -savestate
+        -loadstate
+        -setstate
+        -autosavestate
+        '''
+        ])),
 
     # commands list that the bot will execute even if a human didn't request an
     # action
