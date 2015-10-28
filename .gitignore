@@ -6,3 +6,4 @@ logs/
 htmlcov/
 *.db
 venv/
+ignored/
