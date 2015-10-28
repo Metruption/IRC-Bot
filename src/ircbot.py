@@ -1,4 +1,4 @@
-#! /usr/bin/env python2.7
+#! /usr/bin/env python3.4
 import sys
 import signal
 import concurrent.futures
@@ -150,10 +150,10 @@ def main():
         try:
             os.makedirs(config.log)
         except os.error as e:
-            print "Log directory creation failed: " + str(e)
+            print("Log directory creation failed: " + str(e))
             sys.exit(1)
         else:
-            print "Log directory created"
+            print ("Log directory created")
 
     logfile = get_datetime()['date'] + '.log'
 
@@ -163,7 +163,7 @@ def main():
             format='%(asctime)s - %(levelname)s - %(message)s',
             datefmt='%Y-%m-%d %H:%M:%S')
     except IOError as e:
-        print "Couldn't set up logging: " + str(e)
+        print("Couldn't set up logging: " + str(e))
         sys.exit(1)
 
     if not check_channel(config.channels):
@@ -176,7 +176,7 @@ def main():
     if socket and connect_to((config.server, config.port), socket):
         content = 'Connected to {0}:{1}'.format(config.server, config.port)
         logging.info(content)
-        print content
+        print(content)
 
         config.current_nick = name_bot(socket, config.nicks, config.real_name)
         joined = join_channels(config.channels, socket)
@@ -189,7 +189,7 @@ def main():
 
         content = 'Disconnected from {0}:{1}'.format(config.server, config.port)
         logging.info(content)
-        print content
+        print(content)
 
 if '__main__' == __name__: #pragma: no cover
     main()

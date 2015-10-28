@@ -108,7 +108,7 @@ def sigint_handler(signalnum, frame):
     content = 'Closing: CTRL-c pressed!'
 
     logging.info(content)
-    print '\n' + content
+    print('\n' + content)
 
 def name_bot(irc, nicks, real_name):
     '''Try to name the bot in order to be recognised on IRC
@@ -156,7 +156,7 @@ def create_socket(family=socket.AF_INET, t=socket.SOCK_STREAM, proto=0):
     except IOError as e:
         message =  '{0}\n{1}'.format(err.NO_SOCKET, e)
         logging.error(message)
-        print message
+        print(message)
 
         return None
 
@@ -174,7 +174,7 @@ def connect_to(address, s):
         content = 'Could not connect to {0}\n{1}'.format(address, e)
 
         logging.error(content)
-        print content
+        print(content)
 
         return False
 
@@ -195,13 +195,13 @@ def join_channels(channels, s):
     except IOError as e:
         content = 'Unexpected error while joining {0}: {1}'.format(clist, e)
         logging.error(content)
-        print content
+        print(content)
 
         return False
 
     content = 'Joined: {0}'.format(clist)
     logging.info(content)
-    print content
+    print(content)
 
     return True
 
@@ -217,7 +217,7 @@ def quit_bot(s):
     except IOError as e:
         content = 'Unexpected error while quitting: {0}'.format(e)
         logging.error(content)
-        print content
+        print(content)
 
         return False
 
