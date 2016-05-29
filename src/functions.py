@@ -1,10 +1,11 @@
-import config
+import test_config
 import err
 import datetime
 import socket
 import threading
 import os
 import logging
+import importlib
 
 def get_sender(msg):
     "Returns the user's nick (string) that sent the message"
@@ -38,16 +39,12 @@ def check_cfg(*items):
     return True
 
 
-def check_channel(channels):
+def check_channel(channel):
     '''Check the channels' name to start with a '#' and not to contain any spaces
 
     Returns True if all channels' name are valid, else False
     '''
-    for channel in channels:
-        if '#' != channel[0] or -1 != channel.find(' '):
-            return False
-
-    return True
+    return '#' != channel[0] or -1 != channel.find(' ')
 
 
 def send_to(command):
@@ -59,7 +56,7 @@ def send_to(command):
     '''
     sendto = '' # can be a user's nick(/query) or a channel
 
-    if -1 != command.find('PRIVMSG ' + config.current_nick + ' :'):
+    if -1 != command.find('PRIVMSG ' + test_config.current_nick + ' :'):
         # the command comes from a query
         sendto = get_sender(command)
     else: # the command comes from a channel
@@ -90,11 +87,6 @@ def is_registered(s, user_nick):
                 return False
 
 
-def get_nick(nicks):
-    for nick in nicks:
-        yield nick
-
-
 def sigint_handler(signalnum, frame):
     '''This function handles the CTRL-c KeyboardInterrupt
     '''
@@ -109,44 +101,6 @@ def sigint_handler(signalnum, frame):
 
     logging.info(content)
     print('\n' + content)
-
-def name_bot(irc, nicks, real_name):
-    '''Try to name the bot in order to be recognised on IRC
-
-    irc - an opened socket
-    nicks - a list of strings to choose the nick from
-    real_name - bot's real name
-
-    Return the name of the bot
-    '''
-
-    import random
-    import string
-
-    nick_generator = get_nick(nicks)
-    nick = nick_generator.next()
-    logging.info('Set nick to: {0}\n'.format(nick))
-
-    irc.send('NICK ' + nick + '\r\n')
-    irc.send('USER ' + nick + ' ' + nick + \
-            ' ' + nick + ' :' + real_name + '\r\n')
-
-    while True:
-        receive = irc.recv(4096)
-
-        if 'Nickname is already in use' in receive: # try another nickname
-            try:
-                nick = nick_generator.next()
-            except StopIteration: # if no nick is available just make one up
-                nick = nick + ''.join(random.sample(string.ascii_lowercase, 5))
-
-            irc.send('NICK ' + nick + '\r\n')
-
-            content = 'Changing nick to: {0}\n'.format(nick)
-            logging.info(content)
-        elif nick in receive or 'motd' in receive.lower():
-            # successfully connected
-            return nick
 
 
 def create_socket(family=socket.AF_INET, t=socket.SOCK_STREAM, proto=0):
@@ -177,31 +131,6 @@ def connect_to(address, s):
         print(content)
 
         return False
-
-    return True
-
-
-def join_channels(channels, s):
-    '''Send a JOIN command to the server through the s socket
-    The variable 'channels' is a list of strings that represend the channels to
-    be joined (including the # character)
-
-    Returns True if the command was sent, else False
-    '''
-    clist = ','.join(channels)
-
-    try:
-        s.send('JOIN ' + clist + '\r\n')
-    except IOError as e:
-        content = 'Unexpected error while joining {0}: {1}'.format(clist, e)
-        logging.error(content)
-        print(content)
-
-        return False
-
-    content = 'Joined: {0}'.format(clist)
-    logging.info(content)
-    print(content)
 
     return True
 
@@ -237,8 +166,7 @@ def get_cmd(cmd, cmds_list):
         return None
 
     try: # the command's module needs to be imported from 'cmds/'
-        mod = 'cmds.' + cmd
-        mod = __import__(mod, globals(), locals(), [cmd])
+        mod = importlib.import_module('cmds.' + cmd)
     except ImportError as e: # inexistent module
         logging.error(err.C_INEXISTENT.format(cmd) + str(e))
         return None
@@ -256,16 +184,13 @@ def get_cmd(cmd, cmds_list):
 
 
 def run_cmd(sock, executor, to, cmd, arguments):
-    '''Create a future object for running a command asynchronously and add a
-    callback to send the response of the command back to irc
-    '''
+
     def cb(f):
         try:
             response = f.result()
-        except Exception as e: # TODO: raise a specific exception form the cmds
+        except Exception as e: # TODO: raise a specific exception from the cmds
             response = err.C_EXCEPTION.format(cmd.__name__)
             logging.error(e)
-
         send_response(response, to, sock)
 
     future = executor.submit(cmd, arguments)
@@ -303,7 +228,7 @@ def send_response(response, destination, s):
 
             response = destination + response
         else: # the module sent a command like WHOIS or KICK
-            response = ' '.join(response)
+            response = ' ' + response
 
         # append CRLF if not already appended
         if '\r\n' != response[-2:]:
@@ -311,7 +236,7 @@ def send_response(response, destination, s):
 
         try:
             with send_response_lock:
-                s.send(response)
+                s.send(response.encode('utf-8'))
         except IOError as e:
             logging.error('Unexpected error while sending the response: {0}\n'
                 .format(e))
@@ -325,7 +250,7 @@ def send_response(response, destination, s):
     return None
 
 
-def parse_direction_check(direction):
+def parse_direction(command):
     '''
     up/down/left/right will only be parsed out if the first characters in it are the command and all others are either
     a number (to indicate how many) or whitepace
@@ -341,11 +266,12 @@ def parse_direction_check(direction):
                 upleft              False
                    left  27         left
 '''
-    if direction[0] not in ['u','d','l','r']:
-        return False
 
-    direction = ''.join(i for i in direction if not i.isdigit()) #remove numbers from direction
+    direction = ''.join(i for i in command if not i.isdigit()) #remove numbers from direction
+    digit = ''.join(i for i in command if i.isdigit()) #remove notnumbers from direction
+    if digit == '': #this shit right here is for when they just say "up" or some fucking shit
+        digit = 1
     direction.replace(' ','') #remove spaces from direction
     if direction.lower() in ['up','down','left','right']:
-        return direction.lower()
-    return False
+        return [direction,int(digit)]
+    return ['']
